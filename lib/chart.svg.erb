@@ -1,0 +1,78 @@
+<svg viewBox="0 0 550 266" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <style>
+    .step {
+      fill: white;
+      stroke: black;
+    }
+    .t1 {
+      fill: purple;
+    }
+    .t2 {
+      fill: green;
+    }
+    .b1 {
+      fill: red;
+    }
+    .b2 {
+      fill: #ffcc00;
+    }
+    text {
+      font-size: 4px;
+    }
+  </style>
+  <defs>
+    <g id="wedge">
+      <path class="step" d="M0 0 L 93.7 0 L 90.5 19 L 3.2 19 Z" />
+      <path class="step" d="M 3.2 19 L 90.5 19 L 87.3 38 L 6.4 38 Z" />
+      <path class="step" d="M 6.3 38 L 87.3 38 L 84.1 57 L 9.6 57 Z" />
+      <path class="step" d="M 9.6 57 L 84.1 57 L 80.9 76 L 12.8 76 Z" />
+      <path class="step" d="M 12.8 76 L 80.9 76 L 77.7 95 L 16 95 Z" />
+      <path class="step" d="M 16 95 L 77.7 95 L 74.5 114 L 19.2 114 Z" />
+      <path class="step" d="M 19.2 114 L 74.5 114 L 71.3 133 L 22.4 133 Z" />
+      <path class="step" d="M 22.4 133 L 71.3 133 L 68.1 152 L 25.6 152 Z" />
+      <path class="step" d="M 25.6 152 L 68.1 152 L 64.9 171 L 28.8 171 Z" />
+    </g>
+
+    <% wedge_transforms = [
+      "rotate(-66.401 165.432 104.725)",
+      "rotate(-46.931 167.662 16.114)",
+      "rotate(-27.794 172.088 -183.726)",
+      "rotate(-8.418 197.688 -1275.816)",
+      "rotate(10.479 132.62 1534.414)",
+      "rotate(28.91 150.974 731.724)",
+      "rotate(48.607 156.69 536.206)",
+      "rotate(68.134 159.019 450.25)"
+    ] %>
+  </defs>
+
+  <% @wedges.each_with_index do |wedge, w_idx| %>
+    <g id="<%= "wedge#{w_idx + 1}" %>" transform="<%= wedge_transforms[w_idx] %>">
+      <use xlink:href="#wedge" />
+    <% wedge.rows.reverse.each_with_index do |row, idx| %>
+      <% offset = (3.2 * idx) + (row.remaining_length / 2) %>
+      <% row.singers.each do |singer| %>
+        <% center_x = (offset + singer.center).round(2) %>
+        <% center_y = 9 + (idx * 19) %>
+        <g>
+          <circle cx="<%= center_x %>"
+                  cy="<%= center_y %>"
+                  r="9"
+                  class="<%= singer.section_class %>"/>
+          <text text-anchor="middle"
+                alignment-baseline="central"
+                x="<%= center_x %>"
+                y="<%= center_y %>">
+                <% first, last = singer.name.split(' ') %>
+                <tspan text-anchor="middle"
+                alignment-baseline="central"
+                x="<%= center_x %>" dy="0"><%= first %></tspan>
+                <tspan text-anchor="middle"
+                alignment-baseline="central"
+                x="<%= center_x %>" dy="4"><%= last %></tspan>
+          </text>
+        </g>
+      <% end %>
+    <% end %>
+    </g>
+  <% end %>
+</svg>
