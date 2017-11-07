@@ -8,6 +8,15 @@ class ChorusMember
     :height,
     :center
 
+  SECTION_VALUES = {
+    'B1' => 1,
+    'B2' => 2,
+    'T1' => 3,
+    'T2' => 4,
+    'upper' => 0,
+    'lower' => 10
+  }.freeze
+
   def initialize(name, section, split, height)
     @name = name
     @section = section
@@ -25,5 +34,9 @@ class ChorusMember
 
   def section_class
     section.downcase.tr(' ', '-')
+  end
+
+  def weighted_section_value
+    SECTION_VALUES[section] + SECTION_VALUES[split]
   end
 end

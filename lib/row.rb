@@ -25,7 +25,8 @@ class Row
 
   def sort_by_section!
     centers = singers.collect(&:center)
-    sorted = singers.sort_by(&:section)
+    sorted = singers.sort_by(&:weighted_section_value)
+    # binding.pry if singers.map(&:name).include?('Brian Tillis')
     @singers = sorted.each_with_index do |singer, idx|
       singer.center = centers[idx]
     end

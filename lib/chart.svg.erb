@@ -5,16 +5,19 @@
       stroke: black;
     }
     .t1 {
-      fill: purple;
+      fill: #3c72c9;
     }
     .t2 {
-      fill: green;
+      fill: #618e64;
     }
     .b1 {
-      fill: red;
+      fill: #873429;
     }
     .b2 {
-      fill: #ffcc00;
+      fill: #ffcf00;
+    }
+    .lower {
+      filter: saturate(5);
     }
     text {
       font-size: 4px;
@@ -57,7 +60,7 @@
           <circle cx="<%= center_x %>"
                   cy="<%= center_y %>"
                   r="9"
-                  class="<%= singer.section_class %>"/>
+                  class="<%= singer.section_class %> <%= singer.split %>"/>
           <text text-anchor="middle"
                 alignment-baseline="central"
                 x="<%= center_x %>"

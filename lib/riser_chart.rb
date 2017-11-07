@@ -111,11 +111,23 @@ class RiserChart
   end
 
   def sort_singers(parsed)
-    sections = parsed.group_by(&:section)
-    SECTIONS.map do |section_name|
-      split = sections[section_name].group_by(&:split)
-      [split['upper'], split['lower']]
+    split = parsed.group_by(&:split)
+    uppers = split['upper'].group_by(&:section)
+    lowers = split['lower'].group_by(&:section)
+
+    [].tap do |sorted|
+      SECTIONS.each do |section_name|
+        sorted << uppers[section_name]
+      end
+      SECTIONS.each do |section_name|
+        sorted << lowers[section_name]
+      end
     end.flatten
+    # SECTIONS.map do |section_name|
+    #   # split = sections[section_name].group_by(&:split)
+    #   # [split['upper'], split['lower']]
+    #
+    # end
   end
 
   def present!
