@@ -5,9 +5,9 @@ This is a little Ruby script I created to generate riser charts for the Gay Men'
 
 For each show, create a new directory for the script to generate chart into.
 
-This script depends on two files sourced from Chorus Connection. The first is found in the riser charts section;  create a new riser chart, then right-click on the page choose 'Inspect Element'. Click on the 'Network' tab, and reload the page. Look for 'riser_chart.json' and save this file to your show directory.
+This script depends on two files sourced from Chorus Connection. The first is found in the riser charts section;  create a new riser chart, then right-click on the page choose 'Inspect Element'. Click on the 'Network' tab, and reload the page. Look for `riser_chart.json` and save this file to your show directory.
 
-The second file is the the membership directory info... keep your inspector open, and click on the 'Members' tab in Chrous Connection. You should see a 'members.json' file in the inspector's network tab... save this to your show directory as well.
+The second file is the the membership directory info... keep your inspector open, and click on the 'Members' tab in Chrous Connection. You should see a `chorus_members.json` file in the inspector's network tab... save this to your show directory as well.
 
 Finally, use this script:
 
