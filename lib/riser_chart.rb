@@ -6,21 +6,37 @@ require_relative 'chorus_member'
 
 class RiserChart
   SECTIONS = ['B1', 'B2', 'T1', 'T2'].freeze
+  WEDGE_COUNT = 8
+  STARTING_SPACE = 20.0
 
-  def self.generate!(number_of_wedges, space, target_dir)
-    new(number_of_wedges, space, target_dir)
+  attr_reader :singers, :wedges
+
+  def self.generate!(target_dir)
+    new(target_dir)
   end
 
-  def initialize(wedges, space, target_dir)
+  def initialize(target_dir)
+    @space = STARTING_SPACE
     @target_dir = target_dir
     parsed = parse_riser_data
-    singers = sort_singers(parsed)
-    @wedges = build_chart(wedges, space)
-    fill_chart(@wedges, singers)
+    @singers = sort_singers(parsed)
+    prepare_chart
     dir = "#{@target_dir}/chart_#{Time.now.strftime('%Y%m%d_%H%M%S')}"
     FileUtils.mkdir(dir)
     FileUtils.cd(dir) do
       present!
+    end
+  end
+
+  def prepare_chart
+    @wedges = build_chart(WEDGE_COUNT, @space)
+    fill_chart(@wedges, singers)
+  rescue UnplacedSinger
+    if @space > 10.0
+      @space -= 0.2
+      retry
+    else
+      raise TooManySingers
     end
   end
 
@@ -86,10 +102,11 @@ class RiserChart
 
     unplaced = singers.slice(singer_idx, singers.length - 1)
     if unplaced
-      puts Rainbow("Unplaced Singers: #{unplaced.length}").red
-      puts unplaced.compact.collect(&:name).join(' | ')
+      # puts "\e[31mUnplaced Singers: #{unplaced.length}, space: #{@space}\e[0m"
+      # puts unplaced.compact.collect(&:name).join(' | ')
+      raise UnplacedSinger
     else
-      puts Rainbow('No unplaced singers').green
+      # puts "\e[32mNo unplaced singers\e[0m"
     end
   end
 
@@ -102,14 +119,6 @@ class RiserChart
   end
 
   def present!
-    # @wedges.each_with_index do |wedge, w_idx|
-    #   puts Rainbow("Wedge ##{w_idx + 1}").blue
-    #   wedge.rows.reverse.each_with_index do |row, _idx|
-    #     print "\t#{row.step}: #{row.singers.collect(&:present).join(' | ')}\n"
-    #   end
-    #   puts "===========\n"
-    # end
-
     render_chart(binding)
     build_csv(@wedges)
   end
@@ -121,6 +130,11 @@ class RiserChart
     File.open(file_name, 'w') do |f|
       f << svg
     end
-    puts Rainbow("Check out #{FileUtils.pwd}/#{file_name}!").green
+    puts "\e[32mRiser chart rendered to #{FileUtils.pwd}/#{file_name}\e[0m"
+    puts "Singers will have \e[33m#{@space.round(2)} inches\e[0m of space each."
   end
+
+  class Error < StandardError; end
+  class UnplacedSinger < Error; end
+  class TooManySingers < Error; end
 end
