@@ -7,7 +7,7 @@ require_relative 'chorus_member'
 class RiserChart
   SECTIONS = ['B1', 'B2', 'T1', 'T2'].freeze
   WEDGE_COUNT = 8
-  STARTING_SPACE = 20.0
+  STARTING_SPACE = 30.0
 
   attr_reader :singers, :wedges
 
@@ -20,6 +20,7 @@ class RiserChart
     @target_dir = target_dir
     parsed = parse_riser_data
     @singers = sort_singers(parsed)
+    puts "Placing #{active_ids.length} singers..."
     prepare_chart
     dir = "#{@target_dir}/chart_#{Time.now.strftime('%Y%m%d_%H%M%S')}"
     FileUtils.mkdir(dir)
@@ -32,20 +33,17 @@ class RiserChart
     @wedges = build_chart(WEDGE_COUNT, @space)
     fill_chart(@wedges, singers)
   rescue UnplacedSinger
-    if @space > 10.0
-      @space -= 0.2
-      retry
-    else
-      raise TooManySingers
-    end
+    raise TooManySingers if @space < 10.0
+    @space -= 0.2
+    retry
   end
 
   def active_ids
-    @active ||= begin
-                  json = File.read("#{@target_dir}/chorus_members.json")
-                  data = JSON.parse(json)
-                  data.map { |m| m['id'] if m['status'] == 'Active' }.compact
-                end
+    @active_ids ||= begin
+                      json = File.read("#{@target_dir}/chorus_members.json")
+                      data = JSON.parse(json)
+                      data.map { |m| m['id'] if m['status'] == 'Active' }.compact
+                    end
   end
 
   def parse_riser_data
@@ -53,6 +51,7 @@ class RiserChart
     data['unplaced_singers'].map do |record|
       singer = record['chorus_member']
       next unless active_ids.include?(singer['id'])
+
       name = "#{singer['first_name']} #{singer['last_name']}"
       height = singer['height']
       section = singer['section']
@@ -101,13 +100,7 @@ class RiserChart
     end
 
     unplaced = singers.slice(singer_idx, singers.length - 1)
-    if unplaced
-      # puts "\e[31mUnplaced Singers: #{unplaced.length}, space: #{@space}\e[0m"
-      # puts unplaced.compact.collect(&:name).join(' | ')
-      raise UnplacedSinger
-    else
-      # puts "\e[32mNo unplaced singers\e[0m"
-    end
+    raise UnplacedSinger if unplaced
   end
 
   def sort_singers(parsed)
